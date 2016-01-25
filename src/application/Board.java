@@ -2,6 +2,7 @@ package application;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -103,8 +104,45 @@ public class Board {
 	public void reset() {
 		clicks_count = -1;
 		addClicks();
+		mixPartials();
 	}
 
+	private void mixPartials() {
+
+		Random generator = new Random();
+		List<Partial> mix = new ArrayList<>();
+		int len = partials.size();
+		while(partials.isEmpty() == false) {
+			mix.add(partials.remove(generator.nextInt(len--)));
+		}
+
+		for (int i=0; i<4; i++) {
+			for (int j=0; j<4; j++) {
+				Partial part = (Partial) getPartialFromGrid(j, i);
+				if (part != null) {
+					grid.getChildren().remove(part);
+				}
+			}
+		}
+		for (Node partial : grid.getChildren()) {
+			Partial part = (Partial) partial;
+			if (part != null) {
+				System.out.println(part.getGrid_id());
+			}
+		}
+
+		int aktual = 0;
+		for (int i=0; i<4; i++) {
+			for (int j=0; j<4; j++) {
+					if (i*j != 9) {
+						Partial fromMix = mix.get(aktual++);
+						fromMix.setGrid_x(j);
+						fromMix.setGrid_y(i);
+						grid.add(fromMix, j, i);
+					}
+			}
+		}
+	}
 
 	private PointInt getLeftNeighbor(int x, int y) {
 		if (x-1 >= 0) {
